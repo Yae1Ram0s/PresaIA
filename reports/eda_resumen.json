@@ -1,0 +1,32 @@
+{
+  "VBRMX": {
+    "llenado_medio_pct": 77.73,
+    "llenado_min_pct": 26.43,
+    "fecha_min": "2024-04-06",
+    "llenado_max_pct": 100.5,
+    "mes_mas_bajo": 7,
+    "mes_mas_alto": 11,
+    "cambio_diario_std_pp": 0.2098,
+    "origen_datos": "SIH-CONAGUA"
+  },
+  "VVCMX": {
+    "llenado_medio_pct": 64.11,
+    "llenado_min_pct": 19.11,
+    "fecha_min": "2023-06-29",
+    "llenado_max_pct": 104.62,
+    "mes_mas_bajo": 6,
+    "mes_mas_alto": 10,
+    "cambio_diario_std_pp": 0.308,
+    "origen_datos": "SIH-CONAGUA"
+  },
+  "LBQCH": {
+    "llenado_medio_pct": 50.16,
+    "llenado_min_pct": 11.31,
+    "fecha_min": "1994-10-16",
+    "llenado_max_pct": 105.98,
+    "mes_mas_bajo": 7,
+    "mes_mas_alto": 12,
+    "cambio_diario_std_pp": 0.4548,
+    "origen_datos": "SIH-CONAGUA"
+  }
+}

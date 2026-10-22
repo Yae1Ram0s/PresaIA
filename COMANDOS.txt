@@ -1,0 +1,68 @@
+PresaIA - Comandos
+==================
+
+Ejecutar desde la carpeta del proyecto (presaia\), con el entorno virtual activo:
+    .venv\Scripts\activate
+Si "python -m presaia" no encuentra el paquete:  pip install -e .
+    (o en PowerShell:  $env:PYTHONPATH="src")
+
+
+1. INSTALACION (una sola vez)
+-----------------------------
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+pip install -e .
+python -m playwright install chromium        # Chromium para la descarga automatica del SIH
+cd frontend
+npm install
+npm run build
+cd ..
+
+
+2. PRIMERA VEZ CON DATOS REALES
+-------------------------------
+python -m presaia descargar                  # baja los CSV del SIH (usa Chromium si hace falta)
+python -m presaia todo                       # preparar -> eda -> entrenar -> predecir (~10 min)
+
+
+3. ACTUALIZACION AUTOMATICA
+---------------------------
+python -m presaia actualizar                 # descargar -> preparar -> predecir (sin reentrenar)
+python -m presaia actualizar --cada 24       # lo mismo, repetido cada 24 horas (dejar abierto)
+
+Opciones:
+  --metodo auto                              # (predeterminado) directo y, si lo bloquean, Chromium
+  --metodo navegador                         # usar siempre Chromium
+  --metodo directo                           # nunca usar Chromium
+  --ver-navegador                            # mostrar la ventana de Chromium (para depurar)
+  --servidor ""                              # no avisar al tablero al terminar
+
+
+4. TABLERO WEB
+--------------
+python backend\manage.py runserver           # abrir http://localhost:8010
+                                             # seccion "Cargar datos": subir CSV a mano
+
+Desarrollo (dos terminales):
+python backend\manage.py runserver
+cd frontend && npm run dev                   # http://localhost:5173
+
+
+5. OTROS COMANDOS
+-----------------
+python -m presaia descargar --todas          # todas las presas del catalogo (~5 min)
+python -m presaia diagnosticar               # ranking de presas por calidad de datos
+python -m presaia preparar                   # limpieza y control de calidad
+python -m presaia eda                        # figuras del analisis exploratorio
+python -m presaia entrenar                   # entrenar modelos (reentrenar cada cierto tiempo)
+python -m presaia entrenar --rapido          # sin busqueda de hiperparametros (~3x mas rapido)
+python -m presaia entrenar --forzar          # aunque la presa no cumpla criterios de calidad
+python -m presaia predecir                   # pronostico vigente + avisos
+python -m presaia todo --demo                # todo con datos SINTETICOS de prueba
+python -m presaia todo --config otra.toml    # usar otra configuracion
+
+
+6. PRUEBAS
+----------
+pytest -q

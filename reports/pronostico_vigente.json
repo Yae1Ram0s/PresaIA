@@ -1,0 +1,209 @@
+{
+  "VBRMX": {
+    "presa": "Valle de Bravo (VBRMX)",
+    "origen_datos": "SIH-CONAGUA",
+    "fecha_emision": "2026-10-21",
+    "llenado_actual_pct": 95.28,
+    "pronosticos": [
+      {
+        "horizonte": 7,
+        "fecha": "2026-10-28",
+        "volumen_hm3": 382.87,
+        "llenado_pct": 97.08,
+        "intervalo_hm3": [
+          379.98,
+          385.77
+        ],
+        "modelo": "random_forest"
+      },
+      {
+        "horizonte": 15,
+        "fecha": "2026-11-05",
+        "volumen_hm3": 387.89,
+        "llenado_pct": 98.35,
+        "intervalo_hm3": [
+          381.96,
+          393.83
+        ],
+        "modelo": "random_forest"
+      },
+      {
+        "horizonte": 30,
+        "fecha": "2026-11-20",
+        "volumen_hm3": 390.2,
+        "llenado_pct": 98.94,
+        "intervalo_hm3": [
+          376.93,
+          403.47
+        ],
+        "modelo": "random_forest"
+      }
+    ],
+    "estado": "normal",
+    "avisos": [
+      {
+        "nivel": "informativo",
+        "tipo": "tendencia",
+        "titulo": "Tendencia observada de recuperación",
+        "motivo": "En los últimos 30 días el llenado subió 7.3 pp por mes.",
+        "datos": {
+          "pendiente_pp_por_30d": 7.25
+        }
+      }
+    ]
+  },
+  "VVCMX": {
+    "presa": "Villa Victoria (VVCMX)",
+    "origen_datos": "SIH-CONAGUA",
+    "fecha_emision": "2026-10-21",
+    "llenado_actual_pct": 87.58,
+    "pronosticos": [
+      {
+        "horizonte": 7,
+        "fecha": "2026-10-28",
+        "volumen_hm3": 163.52,
+        "llenado_pct": 88.04,
+        "intervalo_hm3": [
+          160.93,
+          166.11
+        ],
+        "modelo": "random_forest"
+      },
+      {
+        "horizonte": 15,
+        "fecha": "2026-11-05",
+        "volumen_hm3": 162.82,
+        "llenado_pct": 87.66,
+        "intervalo_hm3": [
+          157.39,
+          168.24
+        ],
+        "modelo": "xgboost"
+      },
+      {
+        "horizonte": 30,
+        "fecha": "2026-11-20",
+        "volumen_hm3": 163.28,
+        "llenado_pct": 87.91,
+        "intervalo_hm3": [
+          154.16,
+          172.41
+        ],
+        "modelo": "xgboost"
+      }
+    ],
+    "estado": "normal",
+    "avisos": [
+      {
+        "nivel": "informativo",
+        "tipo": "tendencia",
+        "titulo": "Tendencia observada de recuperación",
+        "motivo": "En los últimos 30 días el llenado subió 4.1 pp por mes.",
+        "datos": {
+          "pendiente_pp_por_30d": 4.1
+        }
+      }
+    ]
+  },
+  "LBQCH": {
+    "presa": "La Boquilla (LBQCH)",
+    "origen_datos": "SIH-CONAGUA",
+    "fecha_emision": "2026-10-21",
+    "llenado_actual_pct": 25.92,
+    "pronosticos": [
+      {
+        "horizonte": 7,
+        "fecha": "2026-10-28",
+        "volumen_hm3": 773.97,
+        "llenado_pct": 26.66,
+        "intervalo_hm3": [
+          745.11,
+          802.83
+        ],
+        "modelo": "random_forest"
+      },
+      {
+        "horizonte": 15,
+        "fecha": "2026-11-05",
+        "volumen_hm3": 792.83,
+        "llenado_pct": 27.31,
+        "intervalo_hm3": [
+          710.08,
+          875.59
+        ],
+        "modelo": "random_forest"
+      },
+      {
+        "horizonte": 30,
+        "fecha": "2026-11-20",
+        "volumen_hm3": 800.99,
+        "llenado_pct": 27.59,
+        "intervalo_hm3": [
+          623.48,
+          978.51
+        ],
+        "modelo": "random_forest"
+      }
+    ],
+    "estado": "atencion",
+    "avisos": [
+      {
+        "nivel": "atencion",
+        "tipo": "llenado_bajo",
+        "titulo": "Llenado proyectado bajo a 7 días",
+        "motivo": "Se estima 26.7 % de llenado para el 28/10/2026 (intervalo 25.7–27.7 %). Umbrales: atención < 40.0 %, crítico < 25.0 %.",
+        "datos": {
+          "horizonte": 7,
+          "llenado_actual_pct": 25.92,
+          "llenado_proyectado_pct": 26.66,
+          "intervalo_pct": [
+            25.67,
+            27.66
+          ],
+          "modelo": "random_forest"
+        }
+      },
+      {
+        "nivel": "atencion",
+        "tipo": "llenado_bajo",
+        "titulo": "Llenado proyectado bajo a 15 días",
+        "motivo": "Se estima 27.3 % de llenado para el 05/11/2026 (intervalo 24.5–30.2 %). Umbrales: atención < 40.0 %, crítico < 25.0 %.",
+        "datos": {
+          "horizonte": 15,
+          "llenado_actual_pct": 25.92,
+          "llenado_proyectado_pct": 27.31,
+          "intervalo_pct": [
+            24.46,
+            30.16
+          ],
+          "modelo": "random_forest"
+        }
+      },
+      {
+        "nivel": "atencion",
+        "tipo": "llenado_bajo",
+        "titulo": "Llenado proyectado bajo a 30 días",
+        "motivo": "Se estima 27.6 % de llenado para el 20/11/2026 (intervalo 21.5–33.7 %). Umbrales: atención < 40.0 %, crítico < 25.0 %.",
+        "datos": {
+          "horizonte": 30,
+          "llenado_actual_pct": 25.92,
+          "llenado_proyectado_pct": 27.59,
+          "intervalo_pct": [
+            21.48,
+            33.71
+          ],
+          "modelo": "random_forest"
+        }
+      },
+      {
+        "nivel": "informativo",
+        "tipo": "tendencia",
+        "titulo": "Tendencia observada de recuperación",
+        "motivo": "En los últimos 30 días el llenado subió 5.7 pp por mes.",
+        "datos": {
+          "pendiente_pp_por_30d": 5.73
+        }
+      }
+    ]
+  }
+}

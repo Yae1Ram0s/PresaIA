@@ -1,0 +1,112 @@
+{
+  "VBRMX": {
+    "clave": "VBRMX",
+    "registros_crudos": 13309,
+    "atipicos_eliminados": 0,
+    "curva_elev_vol": {
+      "coeficientes": [
+        0.11309639788637006,
+        -396.0268059551175,
+        346373.76575660147
+      ],
+      "r2": 0.9994412788587036,
+      "n_puntos": 12271,
+      "nivel_min": 1811.77,
+      "nivel_max": 1830.11
+    },
+    "curva_usada": true,
+    "fecha_inicio": "1990-01-01",
+    "fecha_fin": "2026-10-21",
+    "dias_calendario": 13443,
+    "cobertura_volumen": 0.9916,
+    "anios_con_80pct": 36,
+    "hueco_max_dias": 57,
+    "cobertura_precip": 0.8891,
+    "cobertura_nivel": 0.99,
+    "dias_por_bandera": {
+      "observado": 12271,
+      "reconstruido_nivel": 1038,
+      "faltante": 113,
+      "interpolado": 21
+    },
+    "volumen_min_hm3": 104.25,
+    "volumen_max_hm3": 396.37,
+    "apta": true,
+    "motivo": "cumple criterios",
+    "origen_datos": "SIH-CONAGUA",
+    "archivo_origen": "VBRMX.csv"
+  },
+  "VVCMX": {
+    "clave": "VVCMX",
+    "registros_crudos": 12012,
+    "atipicos_eliminados": 0,
+    "curva_elev_vol": {
+      "coeficientes": [
+        1.1729204260876915,
+        -6081.942917886679,
+        7884165.21694572
+      ],
+      "r2": 0.9999492465200458,
+      "n_puntos": 11981,
+      "nivel_min": 2598.64,
+      "nivel_max": 2605.79
+    },
+    "curva_usada": true,
+    "fecha_inicio": "1990-01-01",
+    "fecha_fin": "2026-10-21",
+    "dias_calendario": 13443,
+    "cobertura_volumen": 0.8936,
+    "anios_con_80pct": 33,
+    "hueco_max_dias": 1430,
+    "cobertura_precip": 0.8936,
+    "cobertura_nivel": 0.8936,
+    "dias_por_bandera": {
+      "observado": 11981,
+      "faltante": 1430,
+      "reconstruido_nivel": 31,
+      "interpolado": 1
+    },
+    "volumen_min_hm3": 35.5,
+    "volumen_max_hm3": 194.32,
+    "apta": true,
+    "motivo": "cumple criterios",
+    "origen_datos": "SIH-CONAGUA",
+    "archivo_origen": "VVCMX.csv"
+  },
+  "LBQCH": {
+    "clave": "LBQCH",
+    "registros_crudos": 13384,
+    "atipicos_eliminados": 6,
+    "curva_elev_vol": {
+      "coeficientes": [
+        2.358724224648018,
+        -6059.531367669444,
+        3892065.81587103
+      ],
+      "r2": 0.9960097124899905,
+      "n_puntos": 12341,
+      "nivel_min": 1287.2,
+      "nivel_max": 1318.02
+    },
+    "curva_usada": true,
+    "fecha_inicio": "1990-01-01",
+    "fecha_fin": "2026-10-21",
+    "dias_calendario": 13443,
+    "cobertura_volumen": 0.9956,
+    "anios_con_80pct": 37,
+    "hueco_max_dias": 59,
+    "cobertura_precip": 0.9055,
+    "cobertura_nivel": 0.9956,
+    "dias_por_bandera": {
+      "observado": 12341,
+      "reconstruido_nivel": 1043,
+      "faltante": 59
+    },
+    "volumen_min_hm3": 328.33,
+    "volumen_max_hm3": 3076.61,
+    "apta": true,
+    "motivo": "cumple criterios",
+    "origen_datos": "SIH-CONAGUA",
+    "archivo_origen": "LBQCH.csv"
+  }
+}
