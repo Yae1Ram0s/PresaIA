@@ -2,8 +2,9 @@
 // y consulta el avance cada pocos segundos hasta que termina.
 import { useEffect, useState } from "react";
 import { obtener } from "./api.js";
+import { Icono } from "./componentes.jsx";
 
-export default function BotonActualizar({ alTerminar }) {
+export default function BotonActualizar({ alTerminar, onMensajeChange }) {
   const [tarea, setTarea] = useState(null);
   const [error, setError] = useState(null);
 
@@ -36,11 +37,15 @@ export default function BotonActualizar({ alTerminar }) {
   const enCurso = tarea?.en_curso;
   const mensaje = error || (enCurso ? tarea.mensaje : tarea?.fin && tarea.mensaje);
   const fallo = error || tarea?.ok === false;
+
+  useEffect(() => {
+    onMensajeChange(mensaje ? { texto: mensaje, fallo: Boolean(fallo) } : null);
+  }, [mensaje, fallo, onMensajeChange]);
+
   return (
     <span className="actualizar">
-      {mensaje && <span className={fallo ? "error" : undefined} title={mensaje}>{mensaje}</span>}
       <button className="boton" disabled={enCurso} onClick={iniciar}>
-        {enCurso ? "Actualizando…" : "⟳ Actualizar"}
+        {enCurso ? "Actualizando…" : <><Icono nombre="recargar" tam={15} /> Actualizar</>}
       </button>
     </span>
   );

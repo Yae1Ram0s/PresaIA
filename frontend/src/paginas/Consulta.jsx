@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import {
-  Area, AreaChart, CartesianGrid, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis,
+  Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
 import { urlApi, useApi } from "../api.js";
 import {
@@ -51,6 +51,29 @@ export default function Consulta() {
   const campo = enPct ? "llenado_pct" : "volumen_hm3";
   const cap = c?.presa.capacidad_namo_hm3;
   const totalDias = c ? Object.values(c.banderas).reduce((a, b) => a + b, 0) : 0;
+  const datosCalidad = c ? Object.entries(c.banderas).map(([origen, dias]) => ({
+    origen: origen.replaceAll("_", " ").replace(/^./, (letra) => letra.toLocaleUpperCase("es-MX")),
+    dias,
+    color: BANDERAS[origen]?.[1] || "var(--tenue)",
+  })).filter((dato) => dato.dias > 0) : [];
+  const posicionesEtiquetaCalidad = {};
+  const ladosEtiquetasCalidad = { izquierda: [], derecha: [] };
+  let diasAcumulados = 0;
+  datosCalidad.forEach((dato, indice) => {
+    const angulo = (90 - (360 * (diasAcumulados + dato.dias / 2)) / totalDias) * (Math.PI / 180);
+    const lado = Math.cos(angulo) < 0 ? "izquierda" : "derecha";
+    ladosEtiquetasCalidad[lado].push({ indice, vertical: Math.sin(angulo) });
+    diasAcumulados += dato.dias;
+  });
+  Object.entries(ladosEtiquetasCalidad).forEach(([lado, etiquetas]) => {
+    etiquetas.sort((a, b) => a.vertical - b.vertical);
+    etiquetas.forEach(({ indice }, posicion) => {
+      posicionesEtiquetaCalidad[indice] = {
+        lado,
+        desplazamiento: (posicion - (etiquetas.length - 1) / 2) * 22,
+      };
+    });
+  });
   const comparacion = c && c.promedio_mes_pct != null ? c.llenado_pct - c.promedio_mes_pct : null;
 
   return (
@@ -61,7 +84,7 @@ export default function Consulta() {
       </Intro>
 
       {cargando ? <EsqueletoMetricas /> : (
-        <div className="metricas">
+        <div className="metricas metricas-consulta">
           <Metrica titulo="Llenado actual" valor={pct(c.llenado_pct)} termino="llenado"
             delta={c.cambio_30d_pp != null ? `${pp(c.cambio_30d_pp)} en 30 días` : null} />
           <Metrica titulo="Volumen almacenado" valor={`${num(c.volumen_hm3)} hm³`} termino="hm3"
@@ -118,31 +141,64 @@ export default function Consulta() {
       <div className="columnas">
         <section>
           <h2>Calidad de los datos <Ayuda termino="bandera" /></h2>
-          {cargando ? <EsqueletoTabla filas={4} columnas={3} /> : (
-            <div className="tabla-scroll">
-              <table className="tabla">
-                <thead><tr><th>Origen del dato</th><th className="num">Días</th><th>Proporción</th></tr></thead>
-                <tbody>
-                  {Object.entries(c.banderas).map(([b, n]) => {
-                    const [termino, color] = BANDERAS[b] || [null, "var(--tenue)"];
-                    const fraccion = totalDias ? (100 * n) / totalDias : 0;
-                    return (
-                      <tr key={b}>
-                        <td>{termino ? <Termino t={termino}>{b.replaceAll("_", " ")}</Termino> : b}</td>
-                        <td className="num">{num(n, 0)}</td>
-                        <td>
-                          <div className="barra-mini" title={pct(fraccion)}>
-                            <div style={{ width: `${fraccion}%`, background: color }} />
-                          </div>
-                          <span className="tenue-chico">{pct(fraccion)}</span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
+          <div className="caja calidad-contenido">
+            {cargando ? <EsqueletoTabla filas={4} columnas={3} /> : (
+              <>
+                <div className="tabla-scroll calidad-tabla">
+                  <table className="tabla">
+                    <thead><tr><th>Origen del dato</th><th className="num">Días</th><th>Proporción</th></tr></thead>
+                    <tbody>
+                      {Object.entries(c.banderas).map(([b, n]) => {
+                        const [termino, color] = BANDERAS[b] || [null, "var(--tenue)"];
+                        const fraccion = totalDias ? (100 * n) / totalDias : 0;
+                        const origen = b.replaceAll("_", " ").replace(/^./, (letra) => letra.toLocaleUpperCase("es-MX"));
+                        return (
+                          <tr key={b}>
+                            <td>{termino ? <Termino t={termino}>{origen}</Termino> : origen}</td>
+                            <td className="num">{num(n, 0)}</td>
+                            <td>
+                              <div className="barra-mini" title={pct(fraccion)}>
+                                <div style={{ width: `${fraccion}%`, background: color }} />
+                              </div>
+                              <span className="tenue-chico">{pct(fraccion)}</span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                {datosCalidad.length > 0 && (
+                  <div className="calidad-grafica" role="img" aria-label="Gráfica circular de la proporción de cada origen de los datos">
+                    <ResponsiveContainer width="100%" height={190}>
+                      <PieChart>
+                        <Tooltip formatter={(valor, nombre) => [`${pct(totalDias ? (100 * valor) / totalDias : 0)} · ${num(valor, 0)} días`, nombre]} />
+                        <Pie data={datosCalidad} dataKey="dias" nameKey="origen" cx="50%" cy="50%" outerRadius={58}
+                          startAngle={90} endAngle={-270} paddingAngle={1}
+                          label={({ index, cx, cy, outerRadius, payload }) => {
+                            const { lado, desplazamiento } = posicionesEtiquetaCalidad[index];
+                            const derecha = lado === "derecha";
+                            const etiquetaX = cx + (derecha ? 1 : -1) * (outerRadius + 34);
+                            const etiquetaY = cy + desplazamiento;
+                            return (
+                              <g className="calidad-etiqueta">
+                                <text x={etiquetaX} y={etiquetaY} textAnchor={derecha ? "start" : "end"}
+                                  dominantBaseline="central" fill={payload.color}>
+                                  {pct(totalDias ? (100 * payload.dias) / totalDias : 0)}
+                                </text>
+                              </g>
+                            );
+                          }}
+                          labelLine={false}>
+                          {datosCalidad.map((dato) => <Cell key={dato.origen} fill={dato.color} />)}
+                        </Pie>
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
           <p className="tenue">Pasa el cursor sobre cada origen para ver qué significa.</p>
         </section>
         <section>

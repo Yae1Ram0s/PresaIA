@@ -91,7 +91,9 @@ export default function Cargar({ presas, alTerminar }) {
         <ul className="lista-archivos">
           {archivos.map((f) => (
             <li key={f.name} className={conocido(f) ? "" : "desconocido"}>
-              <span>{conocido(f) ? "📄" : "⚠️"} <b>{f.name}</b> · {(f.size / 1024).toFixed(0)} KB
+              <span><Icono nombre={conocido(f) ? "archivo" : "alerta"}
+                className={conocido(f) ? "archivo-icono" : "estado-icono estado-icono-atencion"} />{" "}
+                <b>{f.name}</b> · {(f.size / 1024).toFixed(0)} KB
                 {!conocido(f) && <span className="tenue-chico"> — no coincide con ninguna presa configurada</span>}
               </span>
               <button className="buscador-limpiar" onClick={() => quitar(f.name)} disabled={enviando}
@@ -117,7 +119,10 @@ export default function Cargar({ presas, alTerminar }) {
       {error && <Aviso nivel="critico">{error}</Aviso>}
       {resultado && (
         <>
-          {resultado.actualizado && <Aviso nivel="normal">✅ Datos cargados y pronóstico actualizado.</Aviso>}
+          {resultado.actualizado && (
+            <Aviso nivel="normal"><Icono nombre="normal" className="estado-icono estado-icono-normal" />{" "}
+              Datos cargados y pronóstico actualizado.</Aviso>
+          )}
           <div className="tabla-scroll">
             <table className="tabla">
               <thead>
@@ -127,7 +132,9 @@ export default function Cargar({ presas, alTerminar }) {
                 {resultado.archivos.map((a) => (
                   <tr key={a.archivo}>
                     <td>{a.archivo}</td>
-                    <td className={a.ok ? "sube" : "baja"}>{a.ok ? "✔ cargado" : `✘ ${a.detalle}`}</td>
+                    <td className={a.ok ? "sube" : "baja"}>
+                      <Icono nombre={a.ok ? "normal" : "cerrar"} /> {a.ok ? "cargado" : a.detalle}
+                    </td>
                     <td>{a.ok ? `${a.desde} → ${a.hasta}` : "—"}</td>
                     <td>{a.ok ? (a.apta ? "apta" : `no apta: ${a.motivo}`) : "—"}</td>
                     <td>{a.estado ?? "—"}</td>

@@ -41,23 +41,25 @@ export default function Glosario() {
         </div>
       </div>
 
-      {grupos.length === 0 && <p className="vacio">No hay términos que coincidan con «{q}».</p>}
-      {grupos.map(([c, lista]) => (
-        <section key={c}>
-          <h2>{CATEGORIAS[c]}</h2>
-          <dl className="glosario">
-            {lista.map(([k, g]) => (
-              <div key={k} className="glosario-entrada" id={k}>
-                <dt><Resaltar texto={g.titulo} q={q.trim()} /></dt>
-                <dd>
-                  <Resaltar texto={g.definicion} q={q.trim()} />
-                  {g.ejemplo && <span className="glosario-ejemplo">Ejemplo: {g.ejemplo}</span>}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </section>
-      ))}
+      <div className="glosario-resultados" key={`${cat}:${n}`}>
+        {grupos.length === 0 && <p className="vacio">No hay términos que coincidan con «{q}».</p>}
+        {grupos.map(([c, lista]) => (
+          <section key={c}>
+            <h2>{CATEGORIAS[c]}</h2>
+            <dl className="glosario">
+              {lista.map(([k, g]) => (
+                <div key={k} className="glosario-entrada" id={k}>
+                  <dt><Resaltar texto={g.titulo} q={q.trim()} /></dt>
+                  <dd>
+                    <Resaltar texto={g.definicion} q={q.trim()} />
+                    {g.ejemplo && <span className="glosario-ejemplo">Ejemplo: {g.ejemplo}</span>}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        ))}
+      </div>
     </>
   );
 }

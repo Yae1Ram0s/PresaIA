@@ -14,6 +14,35 @@ import { normalizar } from "../glosario.js";
 
 const GRAVEDAD = { critico: 0, atencion: 1, informativo: 2, normal: 3 };
 
+/** Velocímetro de llenado conjunto: arco de 240° con los tramos de estado (crítico, atención, normal) y aguja en el valor actual. */
+function Gauge({ valor, umbrales }) {
+  const cx = 90, cy = 90, r = 70, ini = -210, fin = 30; // grados, 0° = derecha, sentido horario en pantalla
+  const punto = (grados, radio = r) => {
+    const a = (grados * Math.PI) / 180;
+    return [cx + radio * Math.cos(a), cy + radio * Math.sin(a)];
+  };
+  const aGrados = (p) => ini + ((fin - ini) * p) / 100;
+  const tramos = [
+    [0, umbrales.llenado_critico_pct, "var(--critico)"],
+    [umbrales.llenado_critico_pct, umbrales.llenado_atencion_pct, "var(--atencion)"],
+    [umbrales.llenado_atencion_pct, 100, "var(--normal)"],
+  ];
+  const v = Math.min(Math.max(valor || 0, 0), 100);
+  const [px, py] = punto(aGrados(v), r - 8);
+  return (
+    <svg className="gauge" viewBox="0 0 180 130" role="img" aria-label={`Llenado conjunto ${pct(valor)}`}>
+      {tramos.map(([de, a, color]) => {
+        const [x1, y1] = punto(aGrados(de) + 1);
+        const [x2, y2] = punto(aGrados(a) - 1);
+        const grande = aGrados(a) - aGrados(de) > 180 ? 1 : 0;
+        return <path key={de} d={`M${x1} ${y1} A${r} ${r} 0 ${grande} 1 ${x2} ${y2}`} stroke={color} strokeOpacity="0.4" strokeWidth="14" fill="none" />;
+      })}
+      <line x1={cx} y1={cy} x2={px} y2={py} stroke="var(--texto)" strokeWidth="3" strokeLinecap="round" />
+      <circle cx={cx} cy={cy} r="6" fill="var(--texto)" />
+    </svg>
+  );
+}
+
 function MiniSerie({ valores }) {
   const datos = valores.map((y, i) => ({ i, y }));
   return (
@@ -39,7 +68,7 @@ function Barra({ valor, umbrales }) {
 /** Nombres de las presas en un estado, cada uno enlazado a su detalle. */
 function PresasEn({ presas, nivel }) {
   const lista = presas.filter((p) => p.estado === nivel);
-  if (!lista.length) return "Ninguna";
+  if (!lista.length) return <span className={`presas-en-vacio-${nivel}`}>Ninguna</span>;
   return (
     <span className="presas-en">
       {lista.map((p) => (
@@ -208,41 +237,32 @@ export default function Panorama() {
   return (
     <>
       {g.hay_sinteticos && <BandaDemo origen="SINTETICO" />}
-      <h1>Panorama general</h1>
-      <Intro>
-        Resumen de las {g.presas} presas monitoreadas: cuánta agua tienen hoy, cómo se espera que estén en {hmax ?? "los próximos"}{" "}
-        días y cuáles requieren atención. Haz clic en una presa (en el mapa o en la tabla) para ver su detalle.
-      </Intro>
-      <p className="tenue">
-        Capacidad conjunta {num(g.capacidad_total_hm3, 0)} <Termino t="hm3">hm³</Termino> · última observación{" "}
-        {fecha(g.ultima_obs)} · umbrales de llenado:{" "}
-        <Termino t="umbral_llenado_atencion">atención &lt; {u.llenado_atencion_pct} %</Termino>,{" "}
-        <Termino t="umbral_llenado_critico">crítico &lt; {u.llenado_critico_pct} %</Termino>
-      </p>
-
-      <div className="metricas">
-        <Metrica
-          titulo="Almacenamiento conjunto"
-          valor={pct(g.llenado_conjunto_pct)}
-          termino="almacenamiento_conjunto"
-          nota={`${num(g.volumen_total_hm3, 0)} de ${num(g.capacidad_total_hm3, 0)} hm³`}
-        />
-        <Metrica
-          titulo={hmax ? `Proyección conjunta a ${hmax} días` : "Proyección conjunta"}
-          valor={pct(g.llenado_conjunto_proyectado_pct)}
-          termino="proyectado"
-          delta={
-            g.llenado_conjunto_proyectado_pct != null
-              ? pp(g.llenado_conjunto_proyectado_pct - g.llenado_conjunto_actual_con_pron_pct)
-              : null
-          }
-        />
-        <Metrica titulo="Estado crítico" valor={`🔴 ${g.en_critico}`} termino="critico"
-          nota={<PresasEn presas={datos.presas} nivel="critico" />} />
-        <Metrica titulo="Atención" valor={`🟠 ${g.en_atencion}`} termino="atencion"
-          nota={<PresasEn presas={datos.presas} nivel="atencion" />} />
-        <Metrica titulo="Normal" valor={`🟢 ${g.normales}`} termino="normal"
-          nota={<PresasEn presas={datos.presas} nivel="normal" />} />
+      <div className="encabezado-panorama">
+        <div className="encabezado-texto">
+          <h1>Panorama general</h1>
+          <Intro>
+            Resumen de las {g.presas} presas monitoreadas: cuánta agua tienen hoy, cómo se espera que estén en {hmax ?? "los próximos"}{" "}
+            días y cuáles requieren atención. Haz clic en una presa (en el mapa o en la tabla) para ver su detalle.
+          </Intro>
+        </div>
+        <div className="encabezado-datos">
+          <div className="capacidad-gauge">
+            <Gauge valor={g.llenado_conjunto_pct} umbrales={u} />
+            <b>Capacidad conjunta</b>
+            <span>{num(g.capacidad_total_hm3, 0)} <Termino t="hm3">hm³</Termino></span>
+          </div>
+          <div className="encabezado-info">
+            <div className="info-obs">
+              <b><Icono nombre="reloj" tam={16} /> Última observación</b>
+              <span>{fecha(g.ultima_obs)}</span>
+            </div>
+            <div className="info-umbrales">
+              <b>Umbrales de llenado:</b>
+              <Termino t="umbral_llenado_atencion"><span className="umbral-atencion">Atención &lt; {u.llenado_atencion_pct} %,</span></Termino>
+              <Termino t="umbral_llenado_critico"><span className="umbral-critico">Crítico &lt; {u.llenado_critico_pct} %</span></Termino>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="columnas columnas-panorama">
@@ -252,13 +272,53 @@ export default function Panorama() {
             <MapaPresas presas={datos.presas} />
           </div>
         </section>
-        <section>
-          <h2>Llenado en el último año <Ayuda texto="Porcentaje de llenado diario de cada presa durante los últimos 12 meses. Las líneas punteadas son los umbrales de atención (naranja) y crítico (rojo). Haz clic en un nombre de la leyenda para resaltarlo." /></h2>
-          <div className="grafica">
-            <GraficaComparativa datos={datos} u={u} />
-          </div>
-        </section>
+        <div className="metricas-panorama">
+          <section className="grupo-metricas">
+            <h2>Resumen de Capacidad</h2>
+            <div className="metricas metricas-capacidad">
+              <Metrica
+                titulo="Almacenamiento conjunto"
+                valor={pct(g.llenado_conjunto_pct)}
+                termino="almacenamiento_conjunto"
+                className="metrica-panorama"
+                icono="gota"
+                nota={`${num(g.volumen_total_hm3, 0)} de ${num(g.capacidad_total_hm3, 0)} hm³`}
+              />
+              <Metrica
+                titulo={hmax ? `Proyección conjunta a ${hmax} días` : "Proyección conjunta"}
+                valor={pct(g.llenado_conjunto_proyectado_pct)}
+                termino="proyectado"
+                tono="exito"
+                className="metrica-panorama"
+                icono="calendario"
+                delta={
+                  g.llenado_conjunto_proyectado_pct != null
+                    ? pp(g.llenado_conjunto_proyectado_pct - g.llenado_conjunto_actual_con_pron_pct)
+                    : null
+                }
+              />
+            </div>
+          </section>
+          <section className="grupo-metricas">
+            <h2>Estado de las Presas</h2>
+            <div className="metricas metricas-estados">
+              <Metrica titulo="Estado crítico" valor={`${g.en_critico}`} termino="critico" tono="critico" className="metrica-panorama"
+                icono="alerta" nota={<PresasEn presas={datos.presas} nivel="critico" />} />
+              <Metrica titulo="Atención" valor={`${g.en_atencion}`} termino="atencion" tono="atencion" className="metrica-panorama"
+                icono="avisos" nota={<PresasEn presas={datos.presas} nivel="atencion" />} />
+              <Metrica titulo="Normal" valor={`${g.normales}`} termino="normal" tono="normal" className="metrica-panorama"
+                icono="correcto" nota={<PresasEn presas={datos.presas} nivel="normal" />} />
+            </div>
+          </section>
+        </div>
       </div>
+
+      <section>
+        <h2>Llenado en el último año <Ayuda texto="Porcentaje de llenado diario de cada presa durante los últimos 12 meses. Las líneas punteadas son los umbrales de atención (naranja) y crítico (rojo). Haz clic en un nombre de la leyenda para resaltarlo." /></h2>
+        <div className="grafica">
+          <GraficaComparativa datos={datos} u={u} />
+        </div>
+      </section>
 
       <h2>Presas ordenadas por riesgo</h2>
       <p className="tenue">

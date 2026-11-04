@@ -37,7 +37,8 @@ export default function App() {
   const [version, setVersion] = useState(0);
   const { datos: estado, error, cargando, recargar } = useApi("estado", { v: version });
   const { pathname } = useLocation();
-  const [menuAbierto, setMenuAbierto] = useState(false);
+  const [menuAbierto, setMenuAbierto] = useState(() => window.matchMedia("(min-width: 861px)").matches);
+  const [mensajeActualizacion, setMensajeActualizacion] = useState(null);
 
   const partes = pathname.split("/"); // ["", "presas", clave, modulo]
   const presas = estado?.presas || [];
@@ -51,7 +52,7 @@ export default function App() {
     const seccion = TITULOS[moduloActual || partes[1]] || "Panorama general";
     const nombre = claveActual && presas.find((p) => p.clave === claveActual)?.nombre;
     document.title = `${nombre ? `${nombre} · ` : ""}${seccion} — PresaIA`;
-    setMenuAbierto(false);
+    if (window.matchMedia("(max-width: 860px)").matches) setMenuAbierto(false);
     window.scrollTo({ top: 0 });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname, presas.length]);
@@ -62,37 +63,46 @@ export default function App() {
   }, []);
 
   return (
-    <div className="marco">
+    <div className={`marco${menuAbierto ? "" : " menu-cerrado"}`}>
       <BarraCarga />
       <a className="saltar" href="#contenido">Saltar al contenido</a>
 
       <header className="cabecera">
         <NavLink to="/" className="cabecera-titulo">
-          <Icono nombre="gota" tam={22} />
+          <img src="/logo-presa.png" alt="" />
           <span>PresaIA <small>Monitoreo y predicción del almacenamiento de presas</small></span>
         </NavLink>
-        <LogoConagua />
         <div className="cabecera-derecha">
-        <div className="cabecera-estado">
-          {estado?.actualizacion?.fecha && (
-            <Tip contenido="Cuándo se ejecutó por última vez el proceso de actualización (descarga y pronóstico)."
-              tabIndex={0}>
-              <span className="punto-vivo" aria-hidden="true" /> Actualizado{" "}
-              <b>{new Date(estado.actualizacion.fecha).toLocaleString("es-MX", { dateStyle: "medium", timeStyle: "short" })}</b>
-            </Tip>
-          )}
-          {estado?.actualizacion?.ultimo_dato && (
-            <Tip contenido="Fecha más reciente con mediciones publicadas por el SIH." tabIndex={0}>
-              Último dato <b>{fechaLarga(estado.actualizacion.ultimo_dato)}</b>
-            </Tip>
-          )}
-        </div>
-        <BotonActualizar alTerminar={alCargar} />
+          <div className="cabecera-estado">
+            {estado?.actualizacion?.fecha && (
+              <Tip contenido="Cuándo se ejecutó por última vez el proceso de actualización (descarga y pronóstico)."
+                tabIndex={0}>
+                <span className="punto-vivo" aria-hidden="true" /> Actualizado{" "}
+                <b>{new Date(estado.actualizacion.fecha).toLocaleString("es-MX", { dateStyle: "medium", timeStyle: "short" })}</b>
+              </Tip>
+            )}
+            {estado?.actualizacion?.ultimo_dato && (
+              <Tip contenido="Fecha más reciente con mediciones publicadas por el SIH." tabIndex={0}>
+                Último dato <b>{fechaLarga(estado.actualizacion.ultimo_dato)}</b>
+              </Tip>
+            )}
+            {mensajeActualizacion && (
+              <span className={mensajeActualizacion.fallo ? "error" : "actualizacion-mensaje"}>
+                {mensajeActualizacion.texto}
+              </span>
+            )}
+          </div>
+          <LogoConagua />
+          <BotonActualizar alTerminar={alCargar} onMensajeChange={setMensajeActualizacion} />
         </div>
       </header>
 
       <aside className={`lateral${menuAbierto ? " abierto" : ""}`}>
-        {/* Solo en pantallas angostas: el menú se pliega bajo este botón */}
+        <button className="menu-escritorio" onClick={() => setMenuAbierto((abierto) => !abierto)}
+          aria-expanded={menuAbierto} aria-label={menuAbierto ? "Reducir menú" : "Expandir menú"}
+          title={menuAbierto ? "Reducir menú" : "Expandir menú"}>
+          <Icono nombre={menuAbierto ? "panel-izquierda" : "panel-derecha"} tam={16} />
+        </button>
         <button className="menu-movil" onClick={() => setMenuAbierto((a) => !a)} aria-expanded={menuAbierto}>
           <Icono nombre={menuAbierto ? "cerrar" : "menu"} />
           <span>{menuAbierto ? "Cerrar menú" : `Menú${presaActual && claveActual ? ` · ${presaActual.nombre}` : ""}`}</span>
@@ -100,8 +110,9 @@ export default function App() {
 
         <div className="lateral-cuerpo">
           <nav className="nav" aria-label="Secciones">
-            <NavLink to="/" end title="Resumen de todas las presas, mapa y ranking por riesgo">
-              <Icono nombre="panorama" /> Panorama general
+            <NavLink to="/" end title="Resumen de todas las presas, mapa y ranking por riesgo"
+              aria-label="Panorama general">
+              <Icono nombre="panorama" /><span className="nav-texto">Panorama general</span>
             </NavLink>
           </nav>
 
@@ -111,7 +122,9 @@ export default function App() {
             <nav className="nav" aria-label="Presas">
               <div className="nav-grupo">Presas</div>
               {presas.map((p) => (
-                <NavLink key={p.clave} to={`/presas/${p.clave}/${moduloActual || "consulta"}`}>
+                <NavLink key={p.clave} to={`/presas/${p.clave}/${moduloActual || "consulta"}`}
+                  title={p.nombre} aria-label={p.nombre}>
+                  <Icono nombre="ubicacion" />
                   <span className="nav-texto">
                     {p.nombre}
                     <small>{p.estado}</small>
@@ -127,7 +140,8 @@ export default function App() {
                 Analizar <b>{presaActual?.nombre}</b>
               </div>
               {MODULOS.map((m) => (
-                <NavLink key={m.ruta} to={`/presas/${clave}/${m.ruta}`}>
+                <NavLink key={m.ruta} to={`/presas/${clave}/${m.ruta}`} title={m.ayuda}
+                  aria-label={`${m.nombre}: ${m.ayuda}`}>
                   <Icono nombre={m.icono} />
                   <span className="nav-texto">
                     {m.nombre}
@@ -140,14 +154,14 @@ export default function App() {
 
           <nav className="nav" aria-label="Herramientas">
             <div className="nav-grupo">Herramientas</div>
-            <NavLink to="/cargar" title="Subir archivos CSV descargados del SIH">
-              <Icono nombre="cargar" /> Cargar datos
+            <NavLink to="/cargar" title="Subir archivos CSV descargados del SIH" aria-label="Cargar datos">
+              <Icono nombre="cargar" /><span className="nav-texto">Cargar datos</span>
             </NavLink>
-            <NavLink to="/glosario" title="Qué significa cada término técnico">
-              <Icono nombre="glosario" /> Glosario
+            <NavLink to="/glosario" title="Qué significa cada término técnico" aria-label="Glosario">
+              <Icono nombre="glosario" /><span className="nav-texto">Glosario</span>
             </NavLink>
-            <NavLink to="/acerca" title="Cómo funciona y limitaciones">
-              <Icono nombre="acerca" /> Acerca de
+            <NavLink to="/acerca" title="Cómo funciona y limitaciones" aria-label="Acerca de">
+              <Icono nombre="acerca" /><span className="nav-texto">Acerca de</span>
             </NavLink>
           </nav>
 

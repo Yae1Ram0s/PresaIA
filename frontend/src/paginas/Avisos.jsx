@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { urlApi, useApi } from "../api.js";
 import {
-  Aviso, Ayuda, Cargando, Descarga, EncabezadoPresa, ErrorCarga, EsqueletoMetricas, Estado, Intro, Metrica, Termino,
+  Aviso, Ayuda, Cargando, Descarga, EncabezadoPresa, ErrorCarga, EsqueletoMetricas, Estado, Icono, Intro, Metrica, Termino,
 } from "../componentes.jsx";
 import { ETIQUETA, ICONO, pct, pp } from "../formato.js";
 
@@ -85,10 +85,14 @@ export default function Avisos({ umbralesBase }) {
           </div>
 
           <h2>Avisos {datos.avisos.length > 0 && <span className="contador">{datos.avisos.length}</span>}</h2>
-          {datos.avisos.length === 0 && <Aviso nivel="normal">🟢 Sin avisos con los umbrales actuales.</Aviso>}
+          {datos.avisos.length === 0 && (
+            <Aviso nivel="normal"><Icono nombre="normal" className="estado-icono estado-icono-normal" />{" "}
+              Sin avisos con los umbrales actuales.</Aviso>
+          )}
           {datos.avisos.map((a, i) => (
             <Aviso key={i} nivel={a.nivel}>
-              <b>{ICONO[a.nivel]} <Termino t={a.nivel}>{ETIQUETA[a.nivel]}</Termino> — {a.titulo}</b>
+              <b><Icono nombre={ICONO[a.nivel]} className={`estado-icono estado-icono-${a.nivel}`} />{" "}
+                <Termino t={a.nivel}>{ETIQUETA[a.nivel]}</Termino> — {a.titulo}</b>
               <p>{a.motivo}</p>
               <details className="detalle">
                 <summary>Ver los datos con que se calculó</summary>

@@ -2,7 +2,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { NavLink } from "react-router-dom";
 import { usePeticionesEnCurso, useApi } from "./api.js";
-import { ETIQUETA, ICONO, fecha, num } from "./formato.js";
+import { ETIQUETA, fecha, num } from "./formato.js";
 import { GLOSARIO, normalizar } from "./glosario.js";
 
 // ---------------------------------------------------------------------------
@@ -11,7 +11,15 @@ import { GLOSARIO, normalizar } from "./glosario.js";
 const TRAZOS = {
   buscar: ["M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z", "m21 21-4.3-4.3"],
   cerrar: ["M18 6 6 18", "m6 6 12 12"],
+  "flecha-derecha": ["M5 12h14", "m12 5 7 7-7 7"],
+  codigo: ["m8 17-5-5 5-5", "m16 7 5 5-5 5", "m14 4-4 16"],
+  api: ["M12 8c5 0 9-1.3 9-3s-4-3-9-3-9 1.3-9 3 4 3 9 3z", "M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5", "M3 12c0 1.7 4 3 9 3s9-1.3 9-3"],
+  interfaz: ["M3 4h18v13H3z", "M8 21h8", "M12 17v4", "M7 8h.01", "M10 8h7"],
+  "panel-izquierda": ["m15 18-6-6 6-6"],
+  "panel-derecha": ["m9 18 6-6-6-6"],
   info: ["M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z", "M12 16v-4", "M12 8h.01"],
+  archivo: ["M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z", "M14 2v6h6", "M8 13h8", "M8 17h8"],
+  ubicacion: ["M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0z", "M12 10h.01"],
   panorama: ["M3 3h7v9H3z", "M14 3h7v5h-7z", "M14 12h7v9h-7z", "M3 16h7v5H3z"],
   consulta: ["M12 8c5 0 9-1.3 9-3s-4-3-9-3-9 1.3-9 3 4 3 9 3z", "M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5", "M3 12c0 1.7 4 3 9 3s9-1.3 9-3"],
   prediccion: ["M22 7 13.5 15.5 8.5 10.5 2 17", "M16 7h6v6"],
@@ -26,6 +34,12 @@ const TRAZOS = {
   ordenar: ["m7 15 5 5 5-5", "m7 9 5-5 5 5"],
   gota: ["M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"],
   alerta: ["m21.7 18-8-14a2 2 0 0 0-3.4 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3", "M12 9v4", "M12 17h.01"],
+  "lupa-mas": ["M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z", "m21 21-4.3-4.3", "M11 8v6", "M8 11h6"],
+  "lupa-menos": ["M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z", "m21 21-4.3-4.3", "M8 11h6"],
+  reloj: ["M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z", "M12 6v6l4 2"],
+  calendario: ["M8 2v4", "M16 2v4", "M3 10h18", "M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"],
+  correcto: ["M22 11.08V12a10 10 0 1 1-5.93-9.14", "M22 4 12 14.01l-3-3"],
+  normal: ["M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z", "m9 12 2 2 4-4"],
   menu: ["M4 6h16", "M4 12h16", "M4 18h16"],
 };
 
@@ -210,23 +224,30 @@ export function BandaDemo({ origen }) {
   if (origen !== "SINTETICO") return null;
   return (
     <Aviso nivel="atencion">
-      ⚠️ <b>Datos de demostración (<Termino t="sintetico">sintéticos</Termino>).</b> Las cifras de esta pantalla NO
+      <Icono nombre="alerta" className="estado-icono estado-icono-atencion" />{" "}
+      <b>Datos de demostración (<Termino t="sintetico">sintéticos</Termino>).</b> Las cifras de esta pantalla NO
       describen la situación real. Descarga los datos del SIH y vuelve a entrenar para usar datos oficiales.
     </Aviso>
   );
 }
 
-export function Metrica({ titulo, valor, delta, ayuda, termino, neutro, nota }) {
+export function Metrica({ titulo, valor, delta, ayuda, termino, neutro, nota, tono, icono, className = "" }) {
   const signo = typeof delta === "string" ? delta.trim()[0] : null;
   const clase = neutro ? "" : signo === "+" ? "sube" : signo === "-" || signo === "−" ? "baja" : "";
   return (
-    <div className="metrica">
+    <div className={`metrica${tono ? ` metrica-${tono}` : ""}${className ? ` ${className}` : ""}`}>
       <div className="metrica-titulo">
         <span>{titulo}</span>
         {(termino || ayuda) && <Ayuda termino={termino} texto={ayuda} />}
+        {icono && <Icono nombre={icono} className={`metrica-icono metrica-icono-${tono || "neutro"}`} />}
       </div>
       <div className="metrica-valor">{valor}</div>
-      {delta && <div className={`metrica-delta ${clase}`}>{clase === "sube" ? "▲ " : clase === "baja" ? "▼ " : ""}{delta}</div>}
+      {delta && (
+        <div className={`metrica-delta ${clase}`}>
+          {clase && <span className="metrica-delta-flecha" aria-hidden="true">{clase === "sube" ? "▲" : "▼"}</span>}
+          {delta}
+        </div>
+      )}
       {nota && <div className="metrica-nota">{nota}</div>}
     </div>
   );
@@ -234,7 +255,9 @@ export function Metrica({ titulo, valor, delta, ayuda, termino, neutro, nota }) 
 
 export const Estado = ({ nivel }) => (
   <Tip contenido={<ContenidoGlosario termino={nivel} />} className={`estado estado-${nivel}`}>
-    {ICONO[nivel]} {ETIQUETA[nivel]}
+    <Icono nombre={nivel === "critico" ? "alerta" : nivel === "atencion" ? "alerta" : "normal"}
+      className="estado-simbolo" tam={16} />
+    <span>{ETIQUETA[nivel]}</span>
   </Tip>
 );
 
@@ -269,7 +292,7 @@ export function EncabezadoPresa({ clave }) {
       <BandaDemo origen={datos.origen_datos} />
       <h1>{p.nombre}</h1>
       <div className="chips">
-        <span className="chip">📍 {p.estado}</span>
+        <span className="chip chip-ubicacion"><Icono nombre="ubicacion" tam={14} /> {p.estado}</span>
         <Tip contenido={<ContenidoGlosario termino="sistema" />} className="chip" tabIndex={0}>
           Sistema {p.sistema}
         </Tip>

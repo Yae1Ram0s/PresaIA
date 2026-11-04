@@ -1,5 +1,5 @@
 export const ETIQUETA = { critico: "Crítico", atencion: "Atención", informativo: "Informativo", normal: "Normal" };
-export const ICONO = { critico: "🔴", atencion: "🟠", informativo: "ℹ️", normal: "🟢" };
+export const ICONO = { critico: "alerta", atencion: "alerta", informativo: "info", normal: "normal" };
 
 const nf = (dec) => new Intl.NumberFormat("es-MX", { minimumFractionDigits: dec, maximumFractionDigits: dec });
 
