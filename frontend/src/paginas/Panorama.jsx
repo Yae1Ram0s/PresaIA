@@ -115,6 +115,8 @@ function TablaPresas({ presas, umbrales, hmax }) {
   const [q, setQ] = useState("");
   const [filtro, setFiltro] = useState("todos");
   const [orden, setOrden] = useState({ campo: "estado", asc: true });
+  const [versionAnimacion, setVersionAnimacion] = useState(0);
+  const animarResultados = () => setVersionAnimacion((version) => version + 1);
 
   const conteo = (e) => presas.filter((p) => p.estado === e).length;
   const n = normalizar(q.trim());
@@ -133,32 +135,37 @@ function TablaPresas({ presas, umbrales, hmax }) {
       return asc ? r : -r;
     });
 
-  const ordenarPor = (campo) =>
+  const ordenarPor = (campo) => {
     setOrden((o) => ({ campo, asc: o.campo === campo ? !o.asc : true }));
+    animarResultados();
+  };
 
   return (
     <>
       <div className="filtros">
         <div className="buscador-caja">
           <Icono nombre="buscar" tam={16} />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filtrar por presa, estado o sistema…"
+          <input value={q} onChange={(e) => { setQ(e.target.value); animarResultados(); }}
+            placeholder="Filtrar por presa, estado o sistema…"
             aria-label="Filtrar presas" />
           {q && (
-            <button className="buscador-limpiar" onClick={() => setQ("")} aria-label="Borrar filtro">
+            <button className="buscador-limpiar" onClick={() => { setQ(""); animarResultados(); }}
+              aria-label="Borrar filtro">
               <Icono nombre="cerrar" tam={14} />
             </button>
           )}
         </div>
         <div className="segmentado" role="group" aria-label="Filtrar por estado">
           {["todos", "critico", "atencion", "normal"].map((e) => (
-            <button key={e} className={filtro === e ? "activo" : ""} onClick={() => setFiltro(e)}>
+            <button key={e} className={filtro === e ? "activo" : ""}
+              onClick={() => { setFiltro(e); animarResultados(); }}>
               {e === "todos" ? `Todos (${presas.length})` : `${ETIQUETA[e]} (${conteo(e)})`}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="tabla-scroll">
+      <div className="tabla-scroll" data-filter-motion={versionAnimacion ? versionAnimacion % 2 : undefined}>
         <table className="tabla clicable">
           <thead>
             <tr>

@@ -1,0 +1,128 @@
+:root {
+  --motion-duration-fast: 180ms;
+  --motion-duration-standard: 240ms;
+  --motion-easing: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.marco {
+  transition: grid-template-columns var(--motion-duration-standard) var(--motion-easing);
+}
+
+.pagina > * {
+  animation: motion-page-section-enter var(--motion-duration-standard) var(--motion-easing) both;
+}
+
+.pagina > *:nth-child(2) { animation-delay: 25ms; }
+.pagina > *:nth-child(3) { animation-delay: 50ms; }
+.pagina > *:nth-child(4) { animation-delay: 75ms; }
+
+[data-filter-motion="0"] {
+  animation: motion-filter-enter-a 180ms var(--motion-easing);
+}
+
+[data-filter-motion="1"] {
+  animation: motion-filter-enter-b 180ms var(--motion-easing);
+}
+
+.nav a:hover {
+  transform: translateX(2px);
+}
+
+.boton:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+button:active:not(:disabled),
+.boton:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.tabla.clicable tbody tr {
+  transition: background 200ms, transform var(--motion-duration-fast) var(--motion-easing);
+}
+
+.tabla.clicable tbody tr:hover {
+  transform: translateX(2px);
+}
+
+.barra div,
+.barra-mini div {
+  transition: width var(--motion-duration-standard) var(--motion-easing);
+}
+
+.grafica .recharts-line-curve,
+.grafica .recharts-area-area,
+.grafica .recharts-bar-rectangle,
+.grafica .recharts-pie-sector {
+  animation: motion-data-enter var(--motion-duration-standard) ease-out both;
+}
+
+.cabecera-estado .actualizacion-mensaje,
+.cabecera-estado .error {
+  animation: motion-notice-enter 220ms ease-out both;
+}
+
+@keyframes motion-data-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes motion-page-section-enter {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes motion-filter-enter-a {
+  from { opacity: 0.65; transform: translateY(3px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes motion-filter-enter-b {
+  from { opacity: 0.65; transform: translateY(3px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes motion-notice-enter {
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 860px) {
+  .lateral.abierto .lateral-cuerpo {
+    animation: motion-notice-enter 220ms ease-out both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marco,
+  .nav a,
+  .boton,
+  button,
+  .tabla.clicable tbody tr,
+  .barra div,
+  .barra-mini div,
+  [data-filter-motion] {
+    transition: none;
+    animation: none;
+  }
+
+  .pagina > * { animation: none; }
+
+  .nav a:hover,
+  .boton:hover:not(:disabled),
+  button:active:not(:disabled),
+  .boton:active:not(:disabled),
+  .tabla.clicable tbody tr:hover {
+    transform: none;
+  }
+
+  .grafica .recharts-line-curve,
+  .grafica .recharts-area-area,
+  .grafica .recharts-bar-rectangle,
+  .grafica .recharts-pie-sector,
+  .cabecera-estado .actualizacion-mensaje,
+  .cabecera-estado .error,
+  .lateral.abierto .lateral-cuerpo {
+    animation: none;
+  }
+}
