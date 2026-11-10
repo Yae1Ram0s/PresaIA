@@ -13,20 +13,32 @@ Sistema de Información Hidrológica (SIH) de CONAGUA y herramientas de software
 
 Requisitos: Python 3.11 o superior y Node.js 18 o superior (solo para la interfaz web).
 
-```bash
+Abre PowerShell en la carpeta raíz del proyecto y ejecuta:
+
+```powershell
 python -m venv .venv
-# Windows: .venv\Scripts\activate      Linux/Mac: source .venv/bin/activate
-pip install -r requirements.txt
-pip install -e .
-cd frontend && npm install && npm run build && cd ..
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+python -m pip install -e .
+python -m playwright install chromium
+Set-Location frontend
+npm install
+npm run build
+Set-Location ..
 ```
 
 ## 2. Ejecución rápida con datos de demostración
 
-```bash
-python -m presaia todo --demo          # genera datos sintéticos, limpia, entrena y pronostica (≈10 min)
-python backend/manage.py runserver    # abre el tablero en http://localhost:8010
+Con el entorno virtual activo:
+
+```powershell
+python -m presaia todo --demo
+python backend\manage.py runserver
 ```
+
+El segundo comando abre el tablero completo, incluido el diseño React compilado, en
+`http://localhost:8010`. Si modificaste archivos del frontend, vuelve a ejecutar
+`npm run build` antes de reiniciar Django.
 
 > Si `python -m presaia` no encuentra el paquete, ejecuta antes `pip install -e .`
 > o antepone `PYTHONPATH=src` (Windows PowerShell: `$env:PYTHONPATH="src"`).
@@ -38,10 +50,21 @@ Los datos demo llevan la marca **SINTETICO** en el archivo, en los reportes y en
 
 Con recarga en caliente, en dos terminales:
 
-```bash
-python backend/manage.py runserver     # API en http://127.0.0.1:8010/api/
-cd frontend && npm run dev             # interfaz en http://localhost:5173 (redirige /api a Django)
+Terminal 1 (backend):
+
+```powershell
+.\.venv\Scripts\python.exe backend\manage.py runserver
 ```
+
+Terminal 2 (frontend):
+
+```powershell
+Set-Location frontend
+npm run dev
+```
+
+Abre `http://localhost:5173`. Vite muestra el diseño con recarga automática y redirige
+las peticiones `/api` a Django en `http://127.0.0.1:8010`.
 
 Tras volver a entrenar, reinicia Django o envía `POST /api/recargar` para limpiar la caché.
 

@@ -17,5 +17,10 @@ urlpatterns = [
     path("api/", include("api.urls")),
     re_path(r"^assets/(?P<path>.*)$", serve, {"document_root": settings.FRONTEND_DIST / "assets"}),
     re_path(r"^mapa/(?P<path>.*)$", serve, {"document_root": settings.FRONTEND_DIST / "mapa"}),
+    re_path(
+        r"^(?P<path>[^/]+\.(?:png|jpg|jpeg|svg|webp|ico))$",
+        serve,
+        {"document_root": settings.FRONTEND_DIST},
+    ),
     re_path(r"^(?P<ruta>.*)$", frontend),
 ]

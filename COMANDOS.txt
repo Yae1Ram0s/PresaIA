@@ -1,8 +1,8 @@
 PresaIA - Comandos
 ==================
 
-Ejecutar desde la carpeta del proyecto (presaia\), con el entorno virtual activo:
-    .venv\Scripts\activate
+Ejecutar desde la carpeta del proyecto (PresaIA\), en PowerShell:
+    .\.venv\Scripts\Activate.ps1
 Si "python -m presaia" no encuentra el paquete:  pip install -e .
     (o en PowerShell:  $env:PYTHONPATH="src")
 
@@ -10,9 +10,9 @@ Si "python -m presaia" no encuentra el paquete:  pip install -e .
 1. INSTALACION (una sola vez)
 -----------------------------
 python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-pip install -e .
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+python -m pip install -e .
 python -m playwright install chromium        # Chromium para la descarga automatica del SIH
 cd frontend
 npm install
@@ -43,10 +43,12 @@ Opciones:
 --------------
 python backend\manage.py runserver           # abrir http://localhost:8010
                                              # seccion "Cargar datos": subir CSV a mano
+                                             # sirve frontend\dist, incluidas las imagenes
+                                             # si cambia el frontend: cd frontend, npm run build, cd ..
 
 Desarrollo (dos terminales):
-python backend\manage.py runserver
-cd frontend && npm run dev                   # http://localhost:5173
+Terminal 1: python backend\manage.py runserver
+Terminal 2: cd frontend; npm run dev         # http://localhost:5173
 
 
 5. OTROS COMANDOS
